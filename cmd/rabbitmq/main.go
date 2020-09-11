@@ -1,8 +1,8 @@
 package main
 
-import "study_go_micro/cmd/rabbitmq/routing"
+import "study_go_micro/cmd/rabbitmq/topics"
 
 func main() {
-	//routing.Publish()
-	routing.Consume()
+	//topics.Publish()
+	topics.Consume()
 }
