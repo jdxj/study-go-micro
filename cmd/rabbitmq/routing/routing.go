@@ -1,4 +1,4 @@
-package pub_sub
+package routing
 
 import (
 	"fmt"
@@ -8,11 +8,9 @@ import (
 )
 
 func Publish() {
-
-	body := ""
-	if len(os.Args) > 1 {
-		body = os.Args[1]
-	}
+	// program name, routing key, body
+	routingKey := os.Args[1]
+	body := []byte(os.Args[2])
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	PanicErr(err)
@@ -23,8 +21,8 @@ func Publish() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		"logs",
-		"fanout",
+		"logs_direct",
+		"direct",
 		true,
 		false,
 		false,
@@ -34,17 +32,20 @@ func Publish() {
 	PanicErr(err)
 
 	err = ch.Publish(
-		"logs", // exchange
-		"",     // routing key
-		false,  // mandatory
-		false,  // immediate
+		"logs_direct", // exchange
+		routingKey,    // routing key
+		false,         // mandatory
+		false,         // immediate
 		amqp.Publishing{
 			ContentType: "text/plain",
-			Body:        []byte(body),
+			Body:        body,
 		})
 }
 
 func Consume() {
+	// program name, routing key
+	routingKey := os.Args[1]
+
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	PanicErr(err)
 	defer conn.Close()
@@ -54,8 +55,8 @@ func Consume() {
 	defer ch.Close()
 
 	err = ch.ExchangeDeclare(
-		"logs",
-		"fanout",
+		"logs_direct",
+		"direct",
 		true,
 		false,
 		false,
@@ -76,8 +77,8 @@ func Consume() {
 
 	ch.QueueBind(
 		q.Name,
-		"", // routing key
-		"logs",
+		routingKey, // routing key
+		"logs_direct",
 		false,
 		nil,
 	)
