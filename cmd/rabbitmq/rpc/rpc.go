@@ -10,7 +10,7 @@ import (
 )
 
 func Publish() {
-	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	conn, err := amqp.Dial("amqp://guest:guest@127.0.0.1:5672/")
 	PanicErr(err)
 	defer conn.Close()
 
@@ -66,10 +66,11 @@ func Publish() {
 	}()
 
 	<-stop
+
 }
 
 func Consume() {
-	n := os.Args[1]
+	n := os.Args[2]
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	PanicErr(err)

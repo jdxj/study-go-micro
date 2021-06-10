@@ -1,8 +1,15 @@
 package main
 
-import "study_go_micro/cmd/rabbitmq/rpc"
+import (
+	"os"
+	"study_go_micro/cmd/rabbitmq/bind_empty"
+)
 
 func main() {
-	//rpc.Publish()
-	rpc.Consume()
+	switch os.Args[1] {
+	case "1":
+		bind_empty.Publish()
+	case "2":
+		bind_empty.Consume2()
+	}
 }
